@@ -72,6 +72,13 @@ public class pagingAction {
 				pagingHtml.append("</a>");
 			}
 		}
+		pagingHtml.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		// 다음 block 페이지
+		if (totalPage - startPage >= blockPage) {
+			pagingHtml.append("<a href=listAction.action?currentPage="+ (endPage + 1) + ">");
+			pagingHtml.append("다음");
+			pagingHtml.append("</a>");
+		}
 	}
 
 	public int getCurrentPage() {

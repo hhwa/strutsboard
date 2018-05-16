@@ -23,6 +23,7 @@ public class listAction extends ActionSupport{
 	private int blockPage=5;	//한화면에 보여줄 페이지 수
 	private String pagingHtml;	//페이징을 구현한 HTML
 	private pagingAction page;	//페이징 클래스
+	private String search;
 	
 	public listAction() throws IOException{
 		reader = Resources.getResourceAsReader("sqlMapConfig.xml");
@@ -33,8 +34,11 @@ public class listAction extends ActionSupport{
 	//게시판 LIST 액션
 	public String execute() throws Exception {
 		//모든 글을 가져와 list에 넣는다
-		list = sqlMapper.queryForList("selectAll");
-		
+		if(getSearch().equals("%null%")||getSearch().equals("%%")) {
+			list = sqlMapper.queryForList("selectAll");
+		}else {
+			list = sqlMapper.queryForList("selectSearch",getSearch());
+		}
 		totalCount = list.size();//전체 글 갯수
 		//pagingAction 객체 생성
 		page = new pagingAction(currentPage, totalCount,blockCount,blockPage);
@@ -53,7 +57,13 @@ public class listAction extends ActionSupport{
 		
 		return SUCCESS;
 	}
+	public String getSearch() {
+		return "%"+search+"%";
+	}
 
+	public void setSearch(String search) {
+		this.search = search;
+	}
 	public List<boardVO> getList() {
 		return list;
 	}

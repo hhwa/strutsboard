@@ -59,5 +59,17 @@
 		 	<result name="error">/board/checkError.jsp</result>
 		 	<result>/board/checkSuccess.jsp</result>
 		 </action>
+		 
+		 <!-- 게시판 수정 액션 -->
+		 <action name="modifyForm" class="board.viewAction">
+		 	<result type="chain">writeForm</result>
+		 </action>
+		 <action name="modifyAction" class="board.modifyAction">
+		 	<result type="chain">viewAction</result>
+		 </action>
+		 
+		 <action name="deleteAction" class="board.deleteAction">
+		 	<result type="chain">listAction</result>
+		 </action>
 	</package>
 </struts>

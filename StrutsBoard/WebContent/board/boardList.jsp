@@ -34,7 +34,7 @@
 			<s:param name="no">
 				<s:property value="no"/>
 			</s:param>
-			<s:param name="currnetPage">
+			<s:param name="currentPage">
 				<s:property value="currentPage"/>			
 			</s:param>
 		</s:url>
@@ -71,5 +71,15 @@
 		</td>
 	</tr>
 </table>
+<form action="listAction.action" method="post">
+<table>
+	<tr align="center">
+		<td colspan="5" align="center">
+			<input type="text" name="search"/>
+			<input type="submit" value="°Ë»ö" class="inputb">
+		</td>
+	</tr>
+</table>
+</form>
 </body>
 </html>
