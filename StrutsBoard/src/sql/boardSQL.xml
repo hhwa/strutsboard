@@ -15,6 +15,9 @@
 			<result property="file_savename" column="file_savename"/>
 			<result property="readhit" column="readhit"/>
 			<result property="regdate" column="regdate"/>
+			<result property="ref" column="ref"/>
+			<result property="re_step" column="re_step"/>
+			<result property="re_level" column="re_level"/>
 		</resultMap>
 		
 		<!-- 공통으로 사용할 select 절 정의 -->
@@ -30,12 +33,12 @@
 		<!-- select 쿼리문 정의 -->
 		<select id="selectAll" resultMap="boardRes">
 			<include refid="select-all"/>
-			order by no desc
+			order by ref desc, re_step asc
 		</select>
 		
-		<select id="selectSearch" resultMap="boardRes" parameterClass="String">
+		<select id="selectSearch" resultMap="boardRes" parameterClass="java.util.HashMap">
 			<include refid="select-all"/>
-			where subject like #search#
+			where $param1$ like #param2# order by ref desc, re_step asc
 		</select>
 		
 		<select id="selectOne" resultMap="boardRes" parameterClass="int">
@@ -55,7 +58,11 @@
 		
 		<!-- insert 쿼리문 정의 -->
 		<insert id="insertBoard" parameterClass="board">
-			insert into Sboard_hh (no,subject,name,password,content,regdate) values (sboard_hh_no_seq.NEXTVAL,#subject#,#name#,#password#,#content#,#regdate#)
+			insert into Sboard_hh (no,subject,name,password,content,regdate,ref,re_step,re_level) values (sboard_hh_no_seq.NEXTVAL,#subject#,#name#,#password#,#content#,#regdate#,sboard_hh_no_seq.CURRVAL,#re_step#,#re_level#)
+		</insert>
+		
+		<insert id="insertBoardReply" parameterClass="board">
+			insert into Sboard_hh (no,subject,name,password,content,regdate,ref,re_step,re_level) values (sboard_hh_no_seq.NEXTVAL,#subject#,#name#,#password#,#content#,#regdate#,#ref#,#re_step#,#re_level#)
 		</insert>
 		
 		<!-- update 쿼리문 정의 -->
@@ -72,6 +79,10 @@
 		<update id="updateReadHit" parameterClass="board">
 			update sboard_hh set readhit=readhit+1
 			<include refid="where-no"/>
+		</update>
+		
+		<update id="updateReplyStep" parameterClass="board">
+			update sboard_hh set re_step=re_step+1 where ref=#ref# and re_step>#re_step#
 		</update>
 		
 		<!-- delete 쿼리문 정의 -->

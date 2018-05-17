@@ -71,5 +71,15 @@
 		 <action name="deleteAction" class="board.deleteAction">
 		 	<result type="chain">listAction</result>
 		 </action>
+		 
+		 <!-- 게시판 답변 액션 -->
+		 <action name="replyForm" class="board.writeAction" method="reply">
+		 	<result type="chain">writeForm</result>
+		 </action>
+		 <action name="replyAction" class="board.writeAction">
+		 	<result type="redirect-action">
+		 		<param name="actionName">listAction</param>
+		 	</result>
+		 </action>
 	</package>
 </struts>

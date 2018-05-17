@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR"%>
-<%@ taglib prefix="s" uri="/struts-tags" %>    
+<%@ taglib prefix="s" uri="/struts-tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -9,7 +10,7 @@
 <link rel="stylesheet" href="/StrutsBoard/board/common/css/css.css" type="text/css">
 </head>
 <body>
-<table width="600" border="0" cellspacing="0" cellpadding="2">
+<table width="600" border="0" cellspacing="0" cellpadding="2" align="center">
 	<tr>
 		<td align="center"><h2>스트럿츠2 게시판</h2></td>
 	</tr>
@@ -17,7 +18,8 @@
 		<td height="20"></td>
 	</tr>
 </table>
-<table width="600" border="0" cellspacing="0" cellpadding="2">
+<table width="600" border="0" cellspacing="0" cellpadding="2" align="center">
+
 	<tr align="center" bgcolor="#F3F3F3">
 		<td width="50"><strong>번호</strong></td>
 		<td width="350"><strong>제목</strong></td>
@@ -41,7 +43,12 @@
 		
 	<tr bgcolor="#FFFFFF" align="center">
 		<td><s:property value="no"/></td>
-		<td align="left">&nbsp;<s:a href="%{viewURL}"><s:property value="subject"/></s:a></td>
+		<td align="left">
+			<s:if test="re_level!=0">
+				<c:forEach var="i" begin="1" end="${re_level}">&nbsp;→</c:forEach>
+			</s:if>
+			<s:a href="%{viewURL}"><s:property value="subject"/></s:a>
+		</td>
 		<td align="center"><s:property value="name"/></td>
 		<td align="center"><s:property value="regdate"/></td>
 		<td><s:property value="readhit"/></td>
@@ -60,7 +67,6 @@
 		<td height="1" colspan="5"></td>
 	</tr>
 	</s:if>
-	
 	<tr align="center">
 		<td colspan="5"><s:property value="pagingHtml" escape="false"/></td>
 	</tr>
@@ -71,10 +77,16 @@
 		</td>
 	</tr>
 </table>
+<br>
 <form action="listAction.action" method="post">
-<table>
-	<tr align="center">
-		<td colspan="5" align="center">
+<table align="center">
+	<tr>
+		<td>
+			<select name="topic">
+				<option value="0" selected="selected">제목</option>
+				<option value="1">작성자</option>
+				<option value="2">내용</option>
+			</select>
 			<input type="text" name="search"/>
 			<input type="submit" value="검색" class="inputb">
 		</td>
