@@ -2,7 +2,9 @@ package board;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.ibatis.common.resources.Resources;
@@ -24,6 +26,7 @@ public class listAction extends ActionSupport{
 	private String pagingHtml;	//페이징을 구현한 HTML
 	private pagingAction page;	//페이징 클래스
 	private String search;
+	private int topic;
 	
 	public listAction() throws IOException{
 		reader = Resources.getResourceAsReader("sqlMapConfig.xml");
@@ -34,14 +37,21 @@ public class listAction extends ActionSupport{
 	//게시판 LIST 액션
 	public String execute() throws Exception {
 		//모든 글을 가져와 list에 넣는다
-		if(getSearch().equals("%null%")||getSearch().equals("%%")) {
+		
+		if(getSearch()==null||getSearch().equals("")) {
 			list = sqlMapper.queryForList("selectAll");
+			totalCount = list.size();//전체 글 갯수
+			page = new pagingAction(currentPage, totalCount,blockCount,blockPage);//pagingAction 객체 생성
 		}else {
-			list = sqlMapper.queryForList("selectSearch",getSearch());
+			HashMap searchMap = new HashMap();
+			String topics[]= {"subject","name","content"};
+			searchMap.put("param1",topics[getTopic()]);
+			searchMap.put("param2","%"+getSearch()+"%");
+			list = sqlMapper.queryForList("selectSearch",searchMap);
+			totalCount = list.size();//전체 글 갯수
+			page = new pagingAction(currentPage, totalCount,blockCount,blockPage,getSearch());//pagingAction 객체 생성
 		}
-		totalCount = list.size();//전체 글 갯수
-		//pagingAction 객체 생성
-		page = new pagingAction(currentPage, totalCount,blockCount,blockPage);
+		
 		pagingHtml = page.getPagingHtml().toString(); //페이지 HTML 생성.
 		
 		//현재 페이지에서 보여줄 마지막 글의 번호 설정.
@@ -57,8 +67,15 @@ public class listAction extends ActionSupport{
 		
 		return SUCCESS;
 	}
+	public int getTopic() {
+		return topic;
+	}
+
+	public void setTopic(int topic) {
+		this.topic = topic;
+	}
 	public String getSearch() {
-		return "%"+search+"%";
+		return search;
 	}
 
 	public void setSearch(String search) {

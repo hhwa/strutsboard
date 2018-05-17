@@ -30,7 +30,12 @@ public class writeAction extends ActionSupport{
 	private String file_orgName; //업로드 파일의 원래 이름
 	private String file_saveName; // 서버에 저장할 업로드 파일의 이름. 고유번호로 구분
 	Calendar today=Calendar.getInstance(); //오늘 날짜
+	private int ref;
+	private int re_step;
+	private int re_level;
 	
+	boolean reply = false;
+
 	private File upload; //파일 객체
 	private String uploadContentType;  //컨텐츠 타입
 	private String uploadFileName;	//파일 이름
@@ -44,45 +49,103 @@ public class writeAction extends ActionSupport{
 	public String form() throws Exception {
 		return SUCCESS;
 	}
-	public String execute() throws Exception {
+	public String reply() throws Exception {
 		
-		//파라미터와 리절트 객체 생성
+		reply=true;
+		resultClass = new boardVO();
+		
+		resultClass = (boardVO) sqlMapper.queryForObject("selectOne",getNo());
+		resultClass.setSubject("[답변]"+resultClass.getSubject());
+		resultClass.setPassword("");
+		resultClass.setName("");
+		resultClass.setContent("");
+		resultClass.setFile_orgname(null);
+		resultClass.setFile_savename(null);
+		
+		return SUCCESS;
+	}
+	public String execute() throws Exception {
 		paramClass = new boardVO();
 		resultClass = new boardVO();
 		
-		//등록할 항목 설정.
+		
+		if(ref == 0)
+		{
+			paramClass.setRe_step(0);
+			paramClass.setRe_level(0);
+			
+			
+			
+		}
+		else
+		{
+			
+			paramClass.setRef(getRef());
+			paramClass.setRe_step(getRe_step());
+			sqlMapper.update("updateReplyStep", paramClass);
+			
+			paramClass.setRe_step(getRe_step() + 1);
+			paramClass.setRe_level(getRe_level() + 1);
+			paramClass.setRef(getRef());
+		}
+		
 		paramClass.setSubject(getSubject());
 		paramClass.setName(getName());
 		paramClass.setPassword(getPassword());
 		paramClass.setContent(getContent());
 		paramClass.setRegdate(today.getTime());
 		
-		//등록 쿼리 수행.
-		sqlMapper.insert("insertBoard",paramClass);
 		
-		//첨부파일을 선택했다면 파일을 업로드한다.
-		if(getUpload() != null) {
-			//등록한 글 번호 가져오기
+		if(ref == 0)
+			sqlMapper.insert("insertBoard", paramClass);
+		else
+			sqlMapper.insert("insertBoardReply", paramClass);
+		
+		if(getUpload() != null)
+		{
 			resultClass = (boardVO) sqlMapper.queryForObject("selectLastNo");
 			
-			//서버에 저장될 파일 이름과 확장자 설정.
-			String file_name = "file_"+resultClass.getNo();
-			String file_ext = getUploadFileName().substring(getUploadFileName().lastIndexOf('.')+1, getUploadFileName().length());
+			String file_name = "file_" + resultClass.getNo();
+			String file_ext = getUploadFileName().substring(
+					getUploadFileName().lastIndexOf('.') + 1,
+					getUploadFileName().length()
+					);
 			
-			//서버에 파일 저장
-			File destFile = new File(fileUploadPath + file_name + "."+file_ext);
+			File destFile = new File(fileUploadPath + file_name + "." + file_ext);
 			FileUtils.copyFile(getUpload(), destFile);
 			
-			//파일 정보 파라미터 설정.
 			paramClass.setNo(resultClass.getNo());
-			paramClass.setFile_orgname(getUploadFileName()); //원래 파일이름
-			paramClass.setFile_savename(file_name+"."+file_ext); //서버에 저장한 파일 이름
+			paramClass.setFile_orgname(getUploadFileName());
+			paramClass.setFile_savename(file_name + "." +file_ext);
 			
-			//파일 정보 업데이트.
-			sqlMapper.update("updateFile",paramClass);
+			sqlMapper.update("updateFile", paramClass);
 		}
-		
+
 		return SUCCESS;
+	}
+	public boolean isReply() {
+		return reply;
+	}
+	public void setReply(boolean reply) {
+		this.reply = reply;
+	}
+	public int getRef() {
+		return ref;
+	}
+	public void setRef(int ref) {
+		this.ref = ref;
+	}
+	public int getRe_step() {
+		return re_step;
+	}
+	public void setRe_step(int re_step) {
+		this.re_step = re_step;
+	}
+	public int getRe_level() {
+		return re_level;
+	}
+	public void setRe_level(int re_level) {
+		this.re_level = re_level;
 	}
 	
 	public boardVO getParamClass() {
